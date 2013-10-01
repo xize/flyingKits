@@ -1,0 +1,25 @@
+name: flyingKit
+version: 1.0
+description: flying chests with kits!
+author: Xeph0re
+authors: [] 
+website:
+
+main: tv.mineinthebox.flyingKits.flyingKit
+database: false
+depend: []
+softdepend: []
+
+commands:
+  kit:
+     description: allows you to get your kit
+     aliases: []
+     permission:
+     permission-message:
+
+
+permissions:
+  #supertowns.random:
+  #  description: Gives access to all plugin commands
+  #  children:
+  #    supertowns.randomSuper: true
