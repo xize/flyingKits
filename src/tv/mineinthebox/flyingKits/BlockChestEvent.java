@@ -26,12 +26,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class BlockChestEvent implements Listener {
-	
+
 	public static HashMap<String, Location> playerChestLocation = new HashMap<String, Location>();
 	public static HashMap<String, String> lastCommand = new HashMap<String, String>();
 	public static HashMap<String, Chest> chests = new HashMap<String, Chest>();
 	public static HashMap<String, Chest> chests2 = new HashMap<String, Chest>();
-	
+
 	@EventHandler
 	public void checkBlock(EntityChangeBlockEvent e) {
 		if(e.getEntity() instanceof FallingBlock) {
@@ -51,7 +51,8 @@ public class BlockChestEvent implements Listener {
 			}
 		}
 	}
-	
+
+	@SuppressWarnings("deprecation")
 	public void setItemsInChest() {
 		for(Player p : Bukkit.getOnlinePlayers()) {
 			if(playerChestLocation.containsKey(p.getName())) {
@@ -67,12 +68,32 @@ public class BlockChestEvent implements Listener {
 									String[] Itemarguments = con.getString("kit."+lastCommand.get(p.getName())).split(",");
 									for(int i = 0; i < Itemarguments.length; i++) {
 										String[] type = Itemarguments[i].split("=");
-										String materialName = type[0];
+										String material_andData = type[0];
 										String Amount = type[1].replace("{", "").replace("}", "");
-										ItemStack item = new ItemStack(Material.valueOf(materialName));
-										item.setAmount(Integer.valueOf(Amount));
-										chest.getInventory().addItem(item);
-										chest.update();
+										if(material_andData.contains(":")) {
+											try {
+												String[] material = material_andData.split(":");
+												String materialName = material[0];
+												String data = material[1];
+												ItemStack item = new ItemStack(Material.getMaterial(Integer.parseInt(materialName)));
+												item.setAmount(Integer.valueOf(Amount));
+												item.setDurability(Byte.parseByte(data));
+												chest.getInventory().addItem(item);
+												chest.update();
+											} catch(NumberFormatException e) {
+												p.getPlayer().sendMessage(ChatColor.RED + "Exception: this kit is corrupt, one of the data values is not a number or isn't a item id");
+											}
+										} else {
+											try {
+												String materialName = material_andData;
+												ItemStack item = new ItemStack(Material.getMaterial(Integer.parseInt(materialName)));
+												item.setAmount(Integer.valueOf(Amount));
+												chest.getInventory().addItem(item);
+												chest.update();
+											} catch(NumberFormatException e) {
+												p.getPlayer().sendMessage(ChatColor.RED + "Exception: this kit is corrupt, one of the data values is not a number.");
+											}
+										}
 									}
 								}
 								chests.put(p.getName(), chest);
@@ -88,7 +109,7 @@ public class BlockChestEvent implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void openChest(final InventoryOpenEvent e) {
 		if(e.getInventory().getType() == InventoryType.CHEST) {
@@ -109,10 +130,10 @@ public class BlockChestEvent implements Listener {
 								p.playSound(chest.getLocation(), Sound.CHEST_CLOSE, 1, 0);
 								p.playSound(chest.getLocation(), Sound.CHEST_OPEN, 1, 0);
 							}
-						
+
 						}, 50);
 						Bukkit.getScheduler().scheduleSyncDelayedTask(flyingKit.getPlugin, new Runnable() {
-							
+
 							@Override
 							public void run() {
 								p.sendMessage(ChatColor.GREEN + "opening crate 4");
@@ -121,7 +142,7 @@ public class BlockChestEvent implements Listener {
 								p.playSound(chest.getLocation(), Sound.CHEST_CLOSE, 1, 0);
 								p.playSound(chest.getLocation(), Sound.CHEST_OPEN, 1, 0);
 							}
-						
+
 						}, 100);
 						Bukkit.getScheduler().scheduleSyncDelayedTask(flyingKit.getPlugin, new Runnable() {
 
@@ -133,8 +154,8 @@ public class BlockChestEvent implements Listener {
 								p.playSound(chest.getLocation(), Sound.CHEST_CLOSE, 1, 0);
 								p.playSound(chest.getLocation(), Sound.CHEST_OPEN, 1, 0);
 							}
-						
-						
+
+
 						}, 150);
 						Bukkit.getScheduler().scheduleSyncDelayedTask(flyingKit.getPlugin, new Runnable() {
 
@@ -146,7 +167,7 @@ public class BlockChestEvent implements Listener {
 								p.playSound(chest.getLocation(), Sound.CHEST_CLOSE, 1, 0);
 								p.playSound(chest.getLocation(), Sound.CHEST_OPEN, 1, 0);
 							}
-						
+
 						}, 200);
 						Bukkit.getScheduler().scheduleSyncDelayedTask(flyingKit.getPlugin, new Runnable() {
 
@@ -158,10 +179,10 @@ public class BlockChestEvent implements Listener {
 								p.playSound(chest.getLocation(), Sound.CHEST_CLOSE, 1, 0);
 								p.playSound(chest.getLocation(), Sound.CHEST_OPEN, 1, 0);
 							}
-						
+
 						}, 250);
 						Bukkit.getScheduler().scheduleSyncDelayedTask(flyingKit.getPlugin, new Runnable() {
-						
+
 							@Override
 							public void run() {
 								try {
@@ -179,14 +200,14 @@ public class BlockChestEvent implements Listener {
 									//supress this
 								}
 							}
-						
+
 						}, 300);
 					}
 				}
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void closeChest(InventoryCloseEvent e) {
 		if(e.getInventory().getType() == InventoryType.CHEST) {
@@ -205,7 +226,7 @@ public class BlockChestEvent implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void ClearChest(PlayerQuitEvent e) {
 		if(chests.containsKey(e.getPlayer().getName())) {
@@ -221,7 +242,7 @@ public class BlockChestEvent implements Listener {
 			lastCommand.remove(e.getPlayer().getName());
 		}
 	}
-	
+
 	@EventHandler
 	public void ClearChest(PlayerKickEvent e) {
 		if(chests.containsKey(e.getPlayer().getName())) {
@@ -237,7 +258,7 @@ public class BlockChestEvent implements Listener {
 			lastCommand.remove(e.getPlayer().getName());
 		}
 	}
-	
+
 	public static void disableChests() {
 		for(Player p : Bukkit.getOnlinePlayers()) {
 			if(chests.containsKey(p.getPlayer().getName())) {
@@ -254,7 +275,7 @@ public class BlockChestEvent implements Listener {
 			}
 		}
 	}
-	
+
 	public static void playRespectedSound(final Sound sound, final Location loc) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(flyingKit.getPlugin, new Runnable() {
 

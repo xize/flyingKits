@@ -14,16 +14,18 @@ public class configuration {
 	
 	public static ArrayList<String> permissions = new ArrayList<String>();
 	
+	@SuppressWarnings("deprecation")
 	public static void generateConfig() {
 		try {
 			File f = new File(flyingKit.getPlugin.getDataFolder() + File.separator + "kits.yml");
 			if(!f.exists()) {
 				FileConfiguration con = YamlConfiguration.loadConfiguration(f);
 				FileConfigurationOptions opt = con.options();
-				opt.header("you can also use data values instead, inside the brackets means the amount.\neach configuration node will represent as a permission\nas permission: kit.normal\ncommand: /kit normal");
-				con.set("timeUsageBetweenKit", 30);
-				con.set("kit.normal", "STONE_SWORD={1},STONE_AXE={1},STONE_PICKAXE={1},STONE_SPADE={1},MELON={10}");
-				con.set("kit.anotherkit", "IRON_SWORD={1},IRON_AXE={1},IRON_PICKAXE={1},IRON_SPADE={1},MELON={32}");
+				opt.header("This is a little schematic how these values are readable\ndata:subdatavalue={Amount of items}");
+				con.set("timeUsageBetweenKit", 1440);
+				con.set("kit.normal", Material.STONE_SWORD.getId() + "={1}," + Material.STONE_AXE.getId() + "={1}," + Material.STONE_PICKAXE.getId() + "={1}," + Material.STONE_SPADE.getId() + "={1}," + Material.MELON.getId() + "={10}");
+				con.set("kit.anotherkit", Material.IRON_SWORD.getId() + "={1}," + Material.IRON_AXE.getId() + "={1}," + Material.IRON_PICKAXE.getId() +"={1}," + Material.IRON_SPADE.getId() + "={1},"+ Material.MELON.getId() +"={32}");
+				con.set("kit.woolkit", Material.WOOL.getId() + ":0={64}," + Material.WOOL.getId() + ":1={64}," + Material.WOOL.getId() + ":2={64}," + Material.WOOL.getId() + ":3={64}," + Material.WOOL.getId() + ":4={64}," + Material.WOOL.getId() + ":5={64}," + Material.WOOL.getId() + ":6={64}," + Material.WOOL.getId() + ":7={64}," + Material.WOOL.getId() + ":8={64}," + Material.WOOL.getId() + ":9={64}");
 				con.save(f);
 			}
 		} catch(Exception e) {
